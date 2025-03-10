@@ -2,6 +2,8 @@ use axum::{routing::post, Router, Json, extract::State};
 use serde::{Deserialize, Serialize};
 use std::{process::Command, fs, env};
 use tokio::time::{timeout, Duration};
+use std::net::SocketAddr;
+use tokio::net::TcpListener;
 use uuid::Uuid;
 use tower_http::auth::RequireAuthorizationLayer;
 
@@ -78,8 +80,15 @@ async fn main() {
         .layer(RequireAuthorizationLayer::bearer(&api_key))
         .with_state(api_key);
     
-    axum::Server::bind(&"0.0.0.0:8000".parse().unwrap())
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let port: u16 = std::env::var("PORT")
+        .unwrap_or("3000".into())
+        .parse()
+        .expect("failed to convert to number");
+
+    
+    let ipv6 = SocketAddr::from(([0,0,0,0,0,0,0,0], port));
+    
+    let ipv6_listener = TcpListener::bind(&ipv6).await.unwrap();
+
+    axum::serve(ipv6_listener, app).await.unwrap();
 }
