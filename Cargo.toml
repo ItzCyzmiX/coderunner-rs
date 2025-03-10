@@ -11,3 +11,5 @@ serde_json = "1.0.104"
 tokio = { version = "1.29.1", features = ["full"] }
 tracing = "0.1.37"
 tracing-subscriber = "0.3.17"
+tower-http = "0.6.2"
+uuid = "1.15.1"
